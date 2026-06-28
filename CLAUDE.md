@@ -157,3 +157,26 @@ Access debug features: `Cmd+Shift+D` (macOS) or `Ctrl+Shift+D` (Windows/Linux)
 - **macOS**: Metal acceleration, accessibility permissions required
 - **Windows**: Vulkan acceleration, code signing
 - **Linux**: OpenBLAS + Vulkan, limited Wayland support, overlay disabled by default
+
+## Session Continuity
+
+At the start of every session:
+1. Fetch `https://raw.githubusercontent.com/Mediajoy/Claude-snapshot/main/snapshots/Handy/index.json` and read the `sessions` array
+2. Show the user the last 3 sessions (timestamp + problemStatement)
+3. Ask which to resume, or "start fresh" — wait for their answer
+4. Load the chosen session by fetching `https://raw.githubusercontent.com/Mediajoy/Claude-snapshot/main/snapshots/Handy/<file>` and reading `conversation`, `files`, and `problemStatement` as context
+
+When the user says **"save snapshot"**, **"end session"**, **"sync session"**, or **"save progress"**:
+1. Write the session file to `/Users/shahramsedehi/Documents/Github Local/claude-snapshot/snapshots/Handy/<TIMESTAMP>.json` using this schema:
+   ```json
+   {
+     "workspace": "Handy",
+     "conversation": [ last 20-30 relevant exchanges ],
+     "files": [ { "path": "...", "state": "modified|created|deleted", "diff": "..." } ],
+     "problemStatement": "Plain language summary of what was worked on and where things stand",
+     "timestamp": "<ISO 8601>"
+   }
+   ```
+2. Run: `bash "/Users/shahramsedehi/Documents/Github Local/claude-snapshot/scripts/save-snapshot.sh"`
+3. Confirm the push succeeded
+
